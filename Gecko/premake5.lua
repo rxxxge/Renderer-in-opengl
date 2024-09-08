@@ -1,21 +1,27 @@
-project "GLApp"
-	kind "ConsoleApp"
+project "Gecko"
+	kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
 	targetdir "bin/%{cfg.buildcfg}"
 	staticruntime "off"
 
+	pchheader "gkpch.h"
+   	pchsource "src/gkpch.cpp"
+
 	files { "src/**.h", "src/**.cpp" }
 
 	includedirs
 	{
+		"src",
 		"../vendor/glfw/include",
-		"../GL/src",
+		"../vendor/Glad/include"
 	}
 
 	links
 	{
-		"GL"
+		"GLFW",
+		"GLAD",
+		"opengl32.lib"
 	}
 
 	targetdir ("../bin/" .. outputdir .. "/%{prj.name}")
@@ -23,22 +29,21 @@ project "GLApp"
 
 	filter "system:windows"
 		systemversion "latest"
-		defines { "X_PLATFORM_WINDOWS" }
+		defines { "GK_PLATFORM_WINDOWS" }
 
 	filter "configurations:Debug"
-		defines { "X_DEBUG" }
+		defines { "GK_DEBUG" }
 		runtime "Debug"
 		symbols "On"
 	
 	filter "configurations:Release"
-		defines { "X_RELEASE" }
+		defines { "GK_RELEASE" }
 		runtime "Release"
 		optimize "On"
 		symbols "On"
 
 	filter "configurations:Dist"
-		kind "WindowedApp"
-		defines { "X_DIST" }
+		defines { "GK_DIST" }
 		runtime "Release"
 		optimize "On"
 		symbols "Off"

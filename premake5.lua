@@ -1,9 +1,9 @@
-workspace "GLApp"
+workspace "Gecko"
 	architecture "x64"
 	configurations { "Debug", "Release", "Dist" }
-	startproject "GLApp"
+	startproject "GeckoApp"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-include "GL/GLExternal.lua"
-include "GLApp"
+include "Gecko/GeckoExternal.lua"
+include "GeckoApp"

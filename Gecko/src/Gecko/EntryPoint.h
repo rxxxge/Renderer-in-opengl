@@ -1,18 +1,18 @@
 #pragma once
 
-#ifdef X_PLATFORM_WINDOWS
+#ifdef GK_PLATFORM_WINDOWS
 
-extern GL::Application* GL::CreateApplication(int argc, char** argv);
+extern Gecko::Application* Gecko::CreateApplication(int argc, char** argv);
 bool g_ApplicationRunning = true;
 
-namespace GL
+namespace Gecko
 {
 
 	int Main(int argc, char** argv)
 	{
 		while (g_ApplicationRunning)
 		{
-			GL::Application* app = GL::CreateApplication(argc, argv);
+			Gecko::Application* app = Gecko::CreateApplication(argc, argv);
 			app->Run();
 			delete app;
 		}
@@ -22,7 +22,7 @@ namespace GL
 
 }
 
-#ifdef X_DIST
+#ifdef GK_DIST
 
 #include <Windows.h>
 
@@ -35,9 +35,9 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 
 int main(int argc, char** argv)
 {
-	return GL::Main(argc, argv);
+	return Gecko::Main(argc, argv);
 }
 
-#endif // X_DIST
+#endif // GK_DIST
 
-#endif // X_PLATFORM_WINDOWS
+#endif // GK_PLATFORM_WINDOWS

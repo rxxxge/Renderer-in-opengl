@@ -1,5 +1,5 @@
-project "GL"
-	kind "StaticLib"
+project "GeckoApp"
+	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
 	targetdir "bin/%{cfg.buildcfg}"
@@ -9,35 +9,37 @@ project "GL"
 
 	includedirs
 	{
-		"src",
 		"../vendor/glfw/include",
+		-- "../vendor/Glad/include",
+		"../Gecko/src",
 	}
 
 	links
 	{
-		"GLFW"
+		"Gecko"
 	}
 
-	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	targetdir ("../bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("../bin-int/" .. outputdir .. "/%{prj.name}")
 
 	filter "system:windows"
 		systemversion "latest"
-		defines { "X_PLATFORM_WINDOWS" }
+		defines { "GK_PLATFORM_WINDOWS" }
 
 	filter "configurations:Debug"
-		defines { "X_DEBUG", "X_ENABLE_ASSERTS" }
+		defines { "GK_DEBUG" }
 		runtime "Debug"
 		symbols "On"
 	
 	filter "configurations:Release"
-		defines { "X_RELEASE" }
+		defines { "GK_RELEASE" }
 		runtime "Release"
 		optimize "On"
 		symbols "On"
 
 	filter "configurations:Dist"
-		defines { "X_DIST" }
+		kind "WindowedApp"
+		defines { "GK_DIST" }
 		runtime "Release"
 		optimize "On"
 		symbols "Off"

@@ -14,7 +14,8 @@ project "Gecko"
 	{
 		"src",
 		"../vendor/glfw/include",
-		"../vendor/Glad/include"
+		"../vendor/Glad/include",
+		"../vendor/spdlog/include",
 	}
 
 	links

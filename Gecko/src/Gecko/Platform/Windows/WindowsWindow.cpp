@@ -2,6 +2,8 @@
 
 #include "WindowsWindow.h"
 
+#include "Gecko/Log.h"
+#include "Gecko/Core.h"
 #include "Gecko/Platform/OpenGL/OpenGLContext.h"
 
 namespace Gecko {
@@ -10,7 +12,7 @@ namespace Gecko {
 
 	static void GLFWErrorCallback(int error, const char* description)
 	{
-		std::cerr << "GLFW Error: " << error << ", " << description << std::endl; // Temporary
+		GK_CORE_ERROR("GLFW Error: ", error, description);
 	}
 
 	static void framebufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -39,9 +41,12 @@ namespace Gecko {
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
 
+		GK_CORE_INFO("Creating window \"{0}\" ({1}, {2})", m_Data.Title, m_Data.Width, m_Data.Height);
+
 		if (!s_GLFWInitialized)
 		{
 			int success = glfwInit(); // Check for successful init
+			GK_CORE_ASSERT(success, "Failed to initialize glfw!");
 			glfwSetErrorCallback(GLFWErrorCallback); // Set custom error callback
 			s_GLFWInitialized = true;
 		}

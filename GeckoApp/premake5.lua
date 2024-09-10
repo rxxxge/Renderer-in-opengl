@@ -9,9 +9,9 @@ project "GeckoApp"
 
 	includedirs
 	{
-		"../vendor/glfw/include",
-		-- "../vendor/Glad/include",
 		"../Gecko/src",
+		"../vendor/glfw/include",
+		"../vendor/spdlog/include",
 	}
 
 	links

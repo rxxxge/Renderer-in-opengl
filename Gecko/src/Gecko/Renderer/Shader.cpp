@@ -2,13 +2,21 @@
 
 #include "Shader.h"
 
+#include "Gecko/Log.h"
+
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 
 namespace Gecko {
 
 	Shader::Shader(const std::string& vertexSrc, const std::string& fragmentSrc)
 	{
+		// Print some info
+		GLint attributesNum;
+		glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &attributesNum);
+		GK_CORE_INFO("Maximum number of vertex attributes supported: {0}", attributesNum);
+
 		// Empty vertex shader handle
 		GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
@@ -32,7 +40,8 @@ namespace Gecko {
 
 			glDeleteShader(vertexShader);
 
-			// Log Error
+			GK_CORE_ERROR("{0}", infoLog.data());
+			GK_CORE_ASSERT(false, "Vertex shader compilation failed!");
 			return;
 		}
 
@@ -56,7 +65,8 @@ namespace Gecko {
 			glDeleteShader(fragmentShader);
 			glDeleteShader(vertexShader);
 
-			// Log error
+			GK_CORE_ERROR("{0}", infoLog.data());
+			GK_CORE_ASSERT(false, "Fragment shader compilation failed!");
 			return;
 		}
 
@@ -85,7 +95,8 @@ namespace Gecko {
 			glDeleteShader(fragmentShader);
 			glDeleteShader(vertexShader);
 
-			// Log error
+			GK_CORE_ERROR("{0}", infoLog.data());
+			GK_CORE_ASSERT(false, "Shader linkage failed!");
 			return;
 		}
 

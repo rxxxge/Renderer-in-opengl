@@ -12,3 +12,9 @@
 	#define GK_CORE_ASSERT(x, ...)
 #endif
 
+namespace Gecko {
+
+	template<typename T>
+	using Ref = std::shared_ptr<T>;
+
+}

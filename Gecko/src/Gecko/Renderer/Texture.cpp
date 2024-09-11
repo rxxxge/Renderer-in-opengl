@@ -14,5 +14,4 @@ namespace Gecko {
 		return nullptr;
 	}
 
-
 }

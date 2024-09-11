@@ -10,6 +10,7 @@ project "GeckoApp"
 	includedirs
 	{
 		"../Gecko/src",
+		"../vendor/Glad/include",
 		"../vendor/glfw/include",
 		"../vendor/spdlog/include",
 	}

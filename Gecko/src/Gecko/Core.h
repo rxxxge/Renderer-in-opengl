@@ -12,6 +12,8 @@
 	#define GK_CORE_ASSERT(x, ...)
 #endif
 
+#define BIT(x) (1 << x)
+
 namespace Gecko {
 
 	template<typename T>

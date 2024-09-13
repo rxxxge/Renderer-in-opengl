@@ -12,7 +12,9 @@ project "GeckoApp"
 		"../Gecko/src",
 		"../vendor/Glad/include",
 		"../vendor/glfw/include",
+		"../vendor/glm",
 		"../vendor/spdlog/include",
+		"../vendor/stb",
 	}
 
 	links

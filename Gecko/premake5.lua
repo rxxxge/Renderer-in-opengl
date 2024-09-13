@@ -16,6 +16,7 @@ project "Gecko"
 		"../vendor/glfw/include",
 		"../vendor/Glad/include",
 		"../vendor/spdlog/include",
+		"../vendor/glm",
 		"../vendor/stb",
 	}
 

@@ -8,8 +8,6 @@
 
 #include "Gecko/Platform/OpenGL/OpenGLContext.h"
 
-//#include <gl/GLU.h>
-
 namespace Gecko {
 
 	static bool s_GLFWInitialized = false;
@@ -44,6 +42,7 @@ namespace Gecko {
 
 		if (!s_GLFWInitialized)
 		{
+			//glEnable(GL_TEXTURE_2D); // Legacy
 			int success = glfwInit(); // Check for successful init
 			GK_CORE_ASSERT(success, "Failed to initialize glfw!");
 			glfwSetErrorCallback(GLFWErrorCallback); // Set custom error callback
@@ -65,15 +64,7 @@ namespace Gecko {
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			data.Width = width;
 			data.Height = height;
-
-			glViewport(0, 0, width, height);
-			glMatrixMode(GL_PROJECTION);
-			float aspect = (float)width / (float)height;
-			glOrtho(-aspect, aspect, -1, 1, -1, 1);
-
-			glMatrixMode(GL_MODELVIEW);
-			glLoadIdentity();
-
+			
 			WindowResizeEvent event(width, height);
 			data.EventCallback(event);
 		});

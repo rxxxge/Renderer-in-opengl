@@ -7,7 +7,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-#define LEGACY_GL
+//#define LEGACY_GL
 
 namespace Gecko {
 
@@ -15,7 +15,7 @@ namespace Gecko {
 		: m_Path(path)
 	{
 		int widht, height, channels;
-		stbi_set_flip_vertically_on_load(1);
+		//stbi_set_flip_vertically_on_load(true);
 		stbi_uc* data = stbi_load(path.c_str(), &widht, &height, &channels, 0);
 		GK_CORE_ASSERT(data, "Failed to load image!");
 		m_Width = widht;
@@ -30,7 +30,7 @@ namespace Gecko {
 		else if (channels == 3)
 		{
 			internalFormat = GL_RGB8;
-			dataFormat = GL_RG8;
+			dataFormat = GL_RGB;
 		}
 
 		GK_CORE_ASSERT(internalFormat & dataFormat, "Format not supported!");

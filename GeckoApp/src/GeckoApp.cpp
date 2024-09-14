@@ -1,5 +1,8 @@
 #include <Gecko.h>
 
+#include <imgui.h>
+#include <glm/gtc/type_ptr.hpp>
+
 class ExampleLayer : public Gecko::Layer
 {
 public:
@@ -14,9 +17,14 @@ public:
 private:
 	unsigned int m_VertexArray;
 	Gecko::Ref<Gecko::Shader> m_Shader;
+
 	Gecko::Ref<Gecko::VertexBuffer> m_VertexBuffer;
 	Gecko::Ref<Gecko::IndexBuffer> m_IndexBuffer;
+
 	Gecko::Ref<Gecko::Texture2D> m_Texture;
+	Gecko::Ref<Gecko::Texture2D> m_TextureFace;
+	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
+	bool m_DisplayFace = false;
 };
 
 ExampleLayer::ExampleLayer()
@@ -58,46 +66,14 @@ void ExampleLayer::OnAttach()
 
 	m_IndexBuffer.reset(Gecko::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
 
-	std::string vertexSrc = R"(
-			#version 330 core
-			layout (location = 0) in vec3 aPos;
-			layout (location = 1) in vec3 aColor;
-			layout (location = 2) in vec2 aTexCoord;
-
-			out vec3 ourColor;
-			out vec2 TexCoord;
-
-			void main()
-			{
-				gl_Position = vec4(aPos, 1.0);
-				ourColor = aColor;
-				TexCoord = vec2(aTexCoord.x, aTexCoord.y);
-			}
-		)";
-
-	std::string fragmentSrc = R"(
-			#version 330 core
-			out vec4 FragColor;
-
-			in vec3 ourColor;
-			in vec2 TexCoord;
-
-			// texture sampler
-			uniform sampler2D texture1;
-
-			void main()
-			{
-				FragColor = texture(texture1, TexCoord) * vec4(ourColor, 1.0);
-				//FragColor = vec4(ourColor, 1.0);;
-			}
-		)";
-
 	m_Shader = Gecko::Shader::Create("src/assets/shaders/4.1.texture.vs", "src/assets/shaders/4.1.texture.fs");
 	
-	m_Texture = Gecko::Texture2D::Create("src/assets/textures/wall.jpg");
+	m_Texture = Gecko::Texture2D::Create("src/assets/textures/container.jpg");
+	m_TextureFace = Gecko::Texture2D::Create("src/assets/textures/awesomeface.png");
 
 	m_Shader->Bind();
-	//glUniform1i(glGetUniformLocation(m_Shader->GetID(), "texture1"), 0);
+	m_Shader->SetInt("texture1", 0);
+	m_Shader->SetInt("texture2", 1);
 
 	// Wireframe mode
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -110,16 +86,23 @@ void ExampleLayer::OnDetach()
 
 void ExampleLayer::OnEvent(Gecko::Event& e)
 {
-	GK_TRACE("{0}", e.ToString());
+	//GK_TRACE("{0}", e.ToString());
 }
 
 void ExampleLayer::OnUpdate(Gecko::Timestep ts)
 {
+	if (m_DisplayFace)
+		m_Shader->SetFloat("mixFlag", 0.5f);
+	else
+		m_Shader->SetFloat("mixFlag", 0.0f);
+	m_Shader->SetFloat3("color", m_SquareColor);
+
 	glClearColor(0.1f, 0.1f, 0.1f, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	// Bind textures on corresponding texture units
 	m_Texture->Bind(0);
+	m_TextureFace->Bind(1);
 
 	m_Shader->Bind();
 
@@ -129,6 +112,10 @@ void ExampleLayer::OnUpdate(Gecko::Timestep ts)
 
 void ExampleLayer::OnImGuiRender()
 {
+	ImGui::Begin("Settings");
+	ImGui::ColorEdit3("Rectangle color", glm::value_ptr(m_SquareColor));
+	ImGui::Checkbox("Display face", &m_DisplayFace);
+	ImGui::End();
 }
 
 

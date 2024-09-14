@@ -7,10 +7,7 @@
 
 #include "Timestep.h"
 
-// TODO: ImGui Support
-
-//#include "Gecko/Renderer/Shader.h"
-//#include "Gecko/Platform/OpenGL/OpenGLBuffer.h"
+#include "Gecko/ImGui/ImGuiLayer.h"
 
 namespace Gecko
 {
@@ -32,17 +29,14 @@ namespace Gecko
 		inline static Application& Get() { return *s_Instance; }
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
+		bool OnWindowResize(WindowResizeEvent& e);
 	private:
 		std::unique_ptr<Window> m_Window;
-		bool m_Running = true;
+		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;
+		bool m_Running = true;
+		bool m_Minimized = false;
 		float m_LastFrameTime = 0.0f;
-
-		// TEMP
-		//unsigned int m_VertexArray;
-		//std::unique_ptr<Shader> m_Shader; 
-		//std::unique_ptr<VertexBuffer> m_VertexBuffer;
-		//std::unique_ptr<IndexBuffer> m_IndexBuffer;
 	private:
 		static Application* s_Instance;
 	};

@@ -15,6 +15,7 @@ project "GeckoApp"
 		"../vendor/glm",
 		"../vendor/spdlog/include",
 		"../vendor/stb",
+		"../vendor/ImGui",
 	}
 
 	links

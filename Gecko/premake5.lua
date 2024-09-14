@@ -18,12 +18,14 @@ project "Gecko"
 		"../vendor/spdlog/include",
 		"../vendor/glm",
 		"../vendor/stb",
+		"../vendor/ImGui",
 	}
 
 	links
 	{
 		"GLFW",
 		"GLAD",
+		"ImGui",
 		"opengl32.lib"
 	}
 

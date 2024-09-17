@@ -15,14 +15,12 @@ public:
 	virtual void OnUpdate(Gecko::Timestep ts) override;
 	virtual void OnImGuiRender() override;
 private:
-	unsigned int m_VertexArray;
 	Gecko::Ref<Gecko::Shader> m_Shader;
-
-	Gecko::Ref<Gecko::VertexBuffer> m_VertexBuffer;
-	Gecko::Ref<Gecko::IndexBuffer> m_IndexBuffer;
+	Gecko::Ref<Gecko::VertexArray> m_VertexArray;
 
 	Gecko::Ref<Gecko::Texture2D> m_Texture;
 	Gecko::Ref<Gecko::Texture2D> m_TextureFace;
+	// Temp
 	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
 	bool m_DisplayFace = false;
 };
@@ -37,8 +35,8 @@ ExampleLayer::~ExampleLayer()
 
 void ExampleLayer::OnAttach()
 {
-	glCreateVertexArrays(1, &m_VertexArray);
-	glBindVertexArray(m_VertexArray);
+	m_VertexArray = Gecko::VertexArray::Create();
+	m_VertexArray->Bind();
 
 	float vertices[3 * 12] = {
 		// positions          // colors           // texture coords
@@ -48,23 +46,23 @@ void ExampleLayer::OnAttach()
 		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
 	};
 
-	m_VertexBuffer.reset(Gecko::VertexBuffer::Create(vertices, sizeof(vertices)));
+	Gecko::Ref<Gecko::VertexBuffer> vertexBuffer = Gecko::VertexBuffer::Create(vertices, sizeof(vertices));
+	Gecko::BufferLayout layout = {
+		{ Gecko::ShaderDataType::Float3, "a_Pos" },
+		{ Gecko::ShaderDataType::Float3, "a_Color" },
+		{ Gecko::ShaderDataType::Float2, "a_TexCoord" }
+	};
 
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	vertexBuffer->SetLayout(layout);
+	m_VertexArray->AddVertexBuffer(vertexBuffer);
 
 	uint32_t indices[6] = {
 		0, 1, 3, // first triangle
 		1, 2, 3  // second triangle
 	};
 
-	m_IndexBuffer.reset(Gecko::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+	Gecko::Ref<Gecko::IndexBuffer> indexBuffer = Gecko::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
+	m_VertexArray->SetIndexBuffer(indexBuffer);
 
 	m_Shader = Gecko::Shader::Create("src/assets/shaders/4.1.texture.vs", "src/assets/shaders/4.1.texture.fs");
 	
@@ -81,7 +79,7 @@ void ExampleLayer::OnAttach()
 
 void ExampleLayer::OnDetach()
 {
-	glDeleteVertexArrays(1, &m_VertexArray);
+	/*glDeleteVertexArrays(1, &m_VertexArray);*/
 }
 
 void ExampleLayer::OnEvent(Gecko::Event& e)
@@ -106,8 +104,8 @@ void ExampleLayer::OnUpdate(Gecko::Timestep ts)
 
 	m_Shader->Bind();
 
-	glBindVertexArray(m_VertexArray);
-	glDrawElements(GL_TRIANGLES, m_IndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
+	m_VertexArray->Bind();
+	glDrawElements(GL_TRIANGLES, m_VertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 }
 
 void ExampleLayer::OnImGuiRender()

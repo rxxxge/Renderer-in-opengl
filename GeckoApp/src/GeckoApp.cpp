@@ -1,29 +1,9 @@
-#include <Gecko.h>
+#include "GeckoApp.h"
 
 #include <imgui.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-class ExampleLayer : public Gecko::Layer
-{
-public:
-	ExampleLayer();
-	virtual ~ExampleLayer();
-
-	virtual void OnAttach() override;
-	virtual void OnDetach() override;
-	virtual void OnEvent(Gecko::Event& event) override;
-	virtual void OnUpdate(Gecko::Timestep ts) override;
-	virtual void OnImGuiRender() override;
-private:
-	Gecko::Ref<Gecko::Shader> m_Shader;
-	Gecko::Ref<Gecko::VertexArray> m_VertexArray;
-
-	Gecko::Ref<Gecko::Texture2D> m_Texture;
-	Gecko::Ref<Gecko::Texture2D> m_TextureFace;
-	// Temp
-	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
-	bool m_DisplayFace = false;
-};
 
 ExampleLayer::ExampleLayer()
 {
@@ -36,7 +16,7 @@ ExampleLayer::~ExampleLayer()
 void ExampleLayer::OnAttach()
 {
 	m_VertexArray = Gecko::VertexArray::Create();
-	m_VertexArray->Bind();
+	//m_VertexArray->Bind();
 
 	float vertices[3 * 12] = {
 		// positions          // colors           // texture coords
@@ -69,6 +49,17 @@ void ExampleLayer::OnAttach()
 	m_Texture = Gecko::Texture2D::Create("src/assets/textures/container.jpg");
 	m_TextureFace = Gecko::Texture2D::Create("src/assets/textures/awesomeface.png");
 
+	// Transform container
+	// TEMP --------------------
+	glm::mat4 model = glm::mat4(1.0f);
+	glm::mat4 view = glm::mat4(1.0f);
+
+	unsigned int width = Gecko::Application::Get().GetWindow().GetWidth();
+	unsigned int height = Gecko::Application::Get().GetWindow().GetHeight();
+	glm::mat4 perspective = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
+	m_TransformData = std::make_shared<TransformData>(model, view, perspective);
+	//      --------------------
+
 	m_Shader->Bind();
 	m_Shader->SetInt("texture1", 0);
 	m_Shader->SetInt("texture2", 1);
@@ -79,7 +70,6 @@ void ExampleLayer::OnAttach()
 
 void ExampleLayer::OnDetach()
 {
-	/*glDeleteVertexArrays(1, &m_VertexArray);*/
 }
 
 void ExampleLayer::OnEvent(Gecko::Event& e)
@@ -95,6 +85,24 @@ void ExampleLayer::OnUpdate(Gecko::Timestep ts)
 		m_Shader->SetFloat("mixFlag", 0.0f);
 	m_Shader->SetFloat3("color", m_SquareColor);
 
+	// Temp (Rotate shape)
+	glm::mat4 model = glm::mat4(1.0f);
+	m_TransformData->Model = glm::rotate(model, glm::radians(m_Rotate[0]), glm::vec3(1.0, 0.0, 0.0)) *
+							glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotate[1]), glm::vec3(0.0, 1.0, 0.0)) *
+							glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotate[2]), glm::vec3(0.0, 0.0, 1.0));
+
+	// View
+	glm::mat4 view = glm::mat4(1.0f);
+	m_TransformData->View = glm::translate(view, glm::vec3(m_Translate[0], m_Translate[1], m_Translate[2]));
+
+	// Projection
+	m_TransformData->Projection = glm::perspective(glm::radians(m_Fov), m_TransformData->Width/m_TransformData->Height, m_NearPlane, m_FarPlane);
+
+	m_Shader->SetMat4("model", m_TransformData->Model);
+	m_Shader->SetMat4("view", m_TransformData->View);
+	m_Shader->SetMat4("projection", m_TransformData->Projection);
+
+	// Begin Drawing
 	glClearColor(0.1f, 0.1f, 0.1f, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -113,6 +121,13 @@ void ExampleLayer::OnImGuiRender()
 	ImGui::Begin("Settings");
 	ImGui::ColorEdit3("Rectangle color", glm::value_ptr(m_SquareColor));
 	ImGui::Checkbox("Display face", &m_DisplayFace);
+	ImGui::Text("Model settings");
+	ImGui::SliderFloat3("Rotate", m_Rotate, -360, 360);
+	ImGui::SliderFloat3("Translate", m_Translate, -10.0f, 10.0f, "%.4f");
+	ImGui::SliderFloat("FOV", &m_Fov, 0.0f, 200.0f);
+	ImGui::SliderFloat("Near Plane", &m_NearPlane, 0.01f, 1.0f, "%.4f");
+	ImGui::SliderFloat("Far Plane", &m_FarPlane, 100.0f, 10000.0f);
+	//ImGui::SliderFloat3("Rotate", m_Rotate, -360, 360);
 	ImGui::End();
 }
 

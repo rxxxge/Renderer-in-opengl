@@ -234,21 +234,6 @@ namespace Gecko {
 
 	std::string OpenGLShader::ReadFile(const std::string& filepath)
 	{
-		/*std::string shaderCode;
-		std::ifstream shaderFile;
-		shaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	
-		shaderFile.open(filepath);
-		GK_CORE_ASSERT(shaderFile, "Could not open shader file!");
-
-		std::stringstream shaderStream;
-		shaderStream << shaderFile.rdbuf();
-		shaderFile.close();
-
-		shaderCode = shaderStream.str();
-		
-		return shaderCode.c_str();*/
-
 		std::string result;
 		std::ifstream in(filepath, std::ios::in | std::ios::binary); // ifstream closes itself due to RAII
 		if (in)

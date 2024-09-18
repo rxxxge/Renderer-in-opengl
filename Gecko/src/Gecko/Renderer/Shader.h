@@ -28,19 +28,19 @@ namespace Gecko {
 		uint32_t m_RendererID;
 	};
 
-	class ShaderLibrary
-	{
-	public:
-		void Add(const std::string& name, const Ref<Shader>& shader);
-		void Add(const Ref<Shader>& shader);
-		Ref<Shader> Load(const std::string& filepath);
-		Ref<Shader> Load(const std::string& name, const std::string& filepath);
+	//class ShaderLibrary
+	//{
+	//public:
+	//	void Add(const std::string& name, const Ref<Shader>& shader);
+	//	void Add(const Ref<Shader>& shader);
+	//	Ref<Shader> Load(const std::string& filepath);
+	//	Ref<Shader> Load(const std::string& name, const std::string& filepath);
 
-		Ref<Shader> Get(const std::string& name);
+	//	Ref<Shader> Get(const std::string& name);
 
-		bool Exists(const std::string& name) const;
-	private:
-		std::unordered_map<std::string, Ref<Shader>> m_Shaders;
-	};
+	//	bool Exists(const std::string& name) const;
+	//private:
+	//	std::unordered_map<std::string, Ref<Shader>> m_Shaders;
+	//};
 
 }

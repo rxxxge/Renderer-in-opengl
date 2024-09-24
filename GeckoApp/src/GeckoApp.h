@@ -43,10 +43,12 @@ private:
 	// Temp
 	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
 	bool m_DisplayFace = false;
+	bool m_WireframeMode = false;
 	float m_Rotate[3] = { 0.0f };
 	float m_Translate[3] = { 0.0f, 0.0f, -3.0f };
 	float m_Fov = 45.0f;
 	float m_NearPlane = 0.1f;
 	float m_FarPlane = 100.0f;
+	float m_MixValue = 0.0f;
 	Gecko::Ref<TransformData> m_TransformData;
 };

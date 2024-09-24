@@ -21,6 +21,8 @@ namespace Gecko {
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		GK_CORE_ASSERT(status, "Failed to intialize GLAD!");
 
+		glEnable(GL_DEPTH_TEST);
+
 		GK_CORE_INFO("OpenGL info:");
 		GK_CORE_INFO(" -- Vendor: {0}", (const char*)glGetString(GL_VENDOR));
 		GK_CORE_INFO(" -- Renderer: {0}", (const char*)glGetString(GL_RENDERER));

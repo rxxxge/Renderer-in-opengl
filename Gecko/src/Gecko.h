@@ -8,6 +8,7 @@
 #include "Gecko/Platform/OpenGL/OpenGLTexture.h"
 #include "Gecko/Platform/OpenGL/OpenGLVertexArray.h"
 #include "Gecko/Renderer/Texture.h"
+#include "Gecko/Camera.h"
 
 #include <glad/glad.h>
 

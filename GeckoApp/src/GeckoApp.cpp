@@ -6,9 +6,10 @@
 #include <glm/gtc/type_ptr.hpp>
 
 // TEMP
-#include <GLFW/glfw3.h>
+//#include <GLFW/glfw3.h>
 
 ExampleLayer::ExampleLayer()
+	: Layer("Example Layer"), m_Camera(45.0f, 0.1f, 100.0f, 1280.0f, 720.0f)
 {
 }
 
@@ -148,12 +149,18 @@ void ExampleLayer::OnEvent(Gecko::Event& e)
 
 void ExampleLayer::OnUpdate(Gecko::Timestep ts)
 {
+	// Update camera
+	//m_CameraController.OnUpdate(ts);
+	m_Camera.OnUpdate(ts);
+
+	// Enable texture (smiley face)
 	if (m_DisplayFace)
 		m_Shader->SetFloat("mixFlag", m_MixValue);
 	else
 		m_Shader->SetFloat("mixFlag", 0.0f);
 	m_Shader->SetFloat3("color", m_SquareColor);
 
+	// Enable wireframe mode
 	if (m_WireframeMode)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else
@@ -170,17 +177,21 @@ void ExampleLayer::OnUpdate(Gecko::Timestep ts)
 	// View
 	glm::mat4 view = glm::mat4(1.0f);
 	m_TransformData->View = glm::translate(view, glm::vec3(m_Translate[0], m_Translate[1], m_Translate[2]));
+	//m_Shader->SetMat4("view", m_TransformData->View);
+	m_Shader->SetMat4("view", m_Camera.GetView());
 
 	// Projection
 	m_TransformData->Projection = glm::perspective(glm::radians(m_Fov), m_TransformData->Width/m_TransformData->Height, m_NearPlane, m_FarPlane);
+	//m_Shader->SetMat4("projection", m_TransformData->Projection);
+	m_Shader->SetMat4("projection", m_Camera.GetProjection());
 
 	//m_Shader->SetMat4("model", m_TransformData->Model);
-	m_Shader->SetMat4("view", m_TransformData->View);
-	m_Shader->SetMat4("projection", m_TransformData->Projection);
+
 
 	// Begin Drawing
 	glClearColor(0.1f, 0.1f, 0.1f, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
 
 	// Bind textures on corresponding texture units
 	m_Texture->Bind(0);
@@ -215,7 +226,7 @@ void ExampleLayer::OnUpdate(Gecko::Timestep ts)
 		glDrawElements(GL_TRIANGLES, m_VertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 	// ============================================
-	glDrawElements(GL_TRIANGLES, m_VertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+	//glDrawElements(GL_TRIANGLES, m_VertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 }
 
 void ExampleLayer::OnImGuiRender()

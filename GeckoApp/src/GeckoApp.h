@@ -40,7 +40,11 @@ private:
 
 	Gecko::Ref<Gecko::Texture2D> m_Texture;
 	Gecko::Ref<Gecko::Texture2D> m_TextureFace;
+
+	Gecko::Camera m_Camera;
 	// Temp
+	glm::mat4 ViewProjectionMatrix;
+
 	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
 	bool m_DisplayFace = false;
 	bool m_WireframeMode = false;

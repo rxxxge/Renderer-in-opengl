@@ -10,9 +10,18 @@
 
 namespace Gecko {
 
-	Camera::Camera(float verticalFOV = 45.0f, float nearClip = 0.1f, float farClip = 100.0f, float width = 1280.0f, float height = 720.0f)
-		: m_VerticalFOV(verticalFOV), m_NearClip(nearClip), m_FarClip(farClip), m_ViewportWidth(width), m_ViewportHeight(height)
+	Camera::Camera(float width, float height, CameraProps& props = CameraProps())
 	{
+		m_VerticalFOV = props.VerticalFOV;
+		m_NearClip = props.NearClip;
+		m_FarClip = props.FarClip;
+
+		m_Speed = props.Speed;
+		m_RotationSpeed = props.RotationSpeed;
+
+		m_ViewportWidth = width;
+		m_ViewportHeight = height;
+
 		m_ForwardDirection = glm::vec3(0, 0, -1);
 		m_Position = glm::vec3(0, 0, 3);
 
@@ -34,59 +43,7 @@ namespace Gecko {
 
 		Input::SetCursorMode(CursorMode::Locked);
 
-		bool moved = false;
-
-		constexpr glm::vec3 upDirection(0.0f, 1.0f, 0.0f);
-		glm::vec3 rightDirection = glm::cross(m_ForwardDirection, upDirection);
-
-		float speed = 10.0f;
-
-		if (Input::IsKeyPressed(Key::W))
-		{
-			m_Position += m_ForwardDirection * speed * ts;
-			moved = true;
-		}
-		else if (Input::IsKeyPressed(Key::S))
-		{
-			m_Position -= m_ForwardDirection * speed * ts;
-			moved = true;
-		}
-
-		if (Input::IsKeyPressed(Key::A))
-		{
-			m_Position -= rightDirection * speed * ts;
-			moved = true;
-		}
-		else if (Input::IsKeyPressed(Key::D))
-		{
-			m_Position += rightDirection * speed * ts;
-		}
-		// Maybe will remove
-		if (Input::IsKeyPressed(Key::Q))
-		{
-			m_Position -= upDirection * speed * ts;
-			moved = true;
-		}
-		else if (Input::IsKeyPressed(Key::E))
-		{
-			m_Position += upDirection * speed * ts;
-			moved = true;
-		}
-
-		// Rotation
-		if (delta.x != 0.0f || delta.y != 0.0f)
-		{
-			float pitchDelta = delta.y * GetRotationSpeed();
-			float yawDelta = delta.x * GetRotationSpeed();
-
-			glm::quat q = glm::normalize(glm::cross(glm::angleAxis(-pitchDelta, rightDirection),
-				glm::angleAxis(-yawDelta, glm::vec3(0.0f, 1.0f, 0.0f))));
-			m_ForwardDirection = glm::rotate(q, m_ForwardDirection);
-
-			moved = true;
-		}
-
-		if (moved)
+		if (HandleInput(delta,ts))
 		{
 			RecalculateView();
 			RecalculateProjection();
@@ -110,9 +67,72 @@ namespace Gecko {
 		RecalculateProjection();
 	}
 
-	float Camera::GetRotationSpeed()
+	void Camera::UpdateProps(CameraProps& props)
 	{
-		return 0.6f;
+		m_VerticalFOV = props.VerticalFOV;
+		m_NearClip = props.NearClip;
+		m_FarClip = props.FarClip;
+
+		m_Speed = props.Speed;
+		m_RotationSpeed = props.RotationSpeed;
+
+		RecalculateView();
+		RecalculateProjection();
+	}
+
+	bool Camera::HandleInput(glm::vec2 delta, float ts) 
+	{
+		bool moved = false;
+
+		constexpr glm::vec3 upDirection(0.0f, 1.0f, 0.0f);
+		glm::vec3 rightDirection = glm::cross(m_ForwardDirection, upDirection);
+
+		if (Input::IsKeyPressed(Key::W))
+		{
+			m_Position += m_ForwardDirection * m_Speed * ts;
+			moved = true;
+		}
+		else if (Input::IsKeyPressed(Key::S))
+		{
+			m_Position -= m_ForwardDirection * m_Speed * ts;
+			moved = true;
+		}
+
+		if (Input::IsKeyPressed(Key::A))
+		{
+			m_Position -= rightDirection * m_Speed * ts;
+			moved = true;
+		}
+		else if (Input::IsKeyPressed(Key::D))
+		{
+			m_Position += rightDirection * m_Speed * ts;
+		}
+
+		if (Input::IsKeyPressed(Key::Q))
+		{
+			m_Position -= upDirection * m_Speed * ts;
+			moved = true;
+		}
+		else if (Input::IsKeyPressed(Key::E))
+		{
+			m_Position += upDirection * m_Speed * ts;
+			moved = true;
+		}
+
+		// Rotation
+		if (delta.x != 0.0f || delta.y != 0.0f)
+		{
+			float pitchDelta = delta.y * m_RotationSpeed;
+			float yawDelta = delta.x * m_RotationSpeed;
+
+			glm::quat q = glm::normalize(glm::cross(glm::angleAxis(-pitchDelta, rightDirection),
+				glm::angleAxis(-yawDelta, glm::vec3(0.0f, 1.0f, 0.0f))));
+			m_ForwardDirection = glm::rotate(q, m_ForwardDirection);
+
+			moved = true;
+		}
+
+		return moved;
 	}
 
 	void Camera::RecalculateProjection()

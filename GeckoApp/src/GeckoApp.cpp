@@ -9,8 +9,9 @@
 //#include <GLFW/glfw3.h>
 
 ExampleLayer::ExampleLayer()
-	: Layer("Example Layer"), m_Camera(45.0f, 0.1f, 100.0f, 1280.0f, 720.0f)
+	: Layer("Example Layer"), m_Camera(1280.0f, 720.0f, Gecko::CameraProps::CameraProps())
 {
+	//m_Camera.UpdateProps(m_CameraData);
 }
 
 ExampleLayer::~ExampleLayer()
@@ -119,23 +120,9 @@ void ExampleLayer::OnAttach()
 	m_Texture = Gecko::Texture2D::Create("src/assets/textures/container.jpg");
 	m_TextureFace = Gecko::Texture2D::Create("src/assets/textures/awesomeface.png");
 
-	// Transform container
-	// TEMP --------------------
-	glm::mat4 model = glm::mat4(1.0f);
-	glm::mat4 view = glm::mat4(1.0f);
-
-	unsigned int width = Gecko::Application::Get().GetWindow().GetWidth();
-	unsigned int height = Gecko::Application::Get().GetWindow().GetHeight();
-	glm::mat4 perspective = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
-	m_TransformData = std::make_shared<TransformData>(model, view, perspective);
-	//      --------------------
-
 	m_Shader->Bind();
 	m_Shader->SetInt("texture1", 0);
 	m_Shader->SetInt("texture2", 1);
-
-	// Wireframe mode
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 void ExampleLayer::OnDetach()
@@ -150,7 +137,7 @@ void ExampleLayer::OnEvent(Gecko::Event& e)
 void ExampleLayer::OnUpdate(Gecko::Timestep ts)
 {
 	// Update camera
-	//m_CameraController.OnUpdate(ts);
+	m_Camera.UpdateProps(m_CameraData);
 	m_Camera.OnUpdate(ts);
 
 	// Enable texture (smiley face)
@@ -166,27 +153,11 @@ void ExampleLayer::OnUpdate(Gecko::Timestep ts)
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	// Temp (Rotate shape)
-	glm::mat4 model = glm::mat4(1.0f);
-	m_TransformData->Model = glm::rotate(model, glm::radians(m_Rotate[0]), glm::vec3(1.0, 0.0, 0.0)) *
-							glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotate[1]), glm::vec3(0.0, 1.0, 0.0)) *
-							glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotate[2]), glm::vec3(0.0, 0.0, 1.0));
-
-	//m_TransformData->Model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-
 	// View
-	glm::mat4 view = glm::mat4(1.0f);
-	m_TransformData->View = glm::translate(view, glm::vec3(m_Translate[0], m_Translate[1], m_Translate[2]));
-	//m_Shader->SetMat4("view", m_TransformData->View);
 	m_Shader->SetMat4("view", m_Camera.GetView());
 
 	// Projection
-	m_TransformData->Projection = glm::perspective(glm::radians(m_Fov), m_TransformData->Width/m_TransformData->Height, m_NearPlane, m_FarPlane);
-	//m_Shader->SetMat4("projection", m_TransformData->Projection);
 	m_Shader->SetMat4("projection", m_Camera.GetProjection());
-
-	//m_Shader->SetMat4("model", m_TransformData->Model);
-
 
 	// Begin Drawing
 	glClearColor(0.1f, 0.1f, 0.1f, 1);
@@ -220,8 +191,7 @@ void ExampleLayer::OnUpdate(Gecko::Timestep ts)
 		model = glm::translate(model, cubePositions[i]);
 		float angle = 20.0f * i;
 		model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-		m_TransformData->Model = model;
-		m_Shader->SetMat4("model", m_TransformData->Model);
+		m_Shader->SetMat4("model", model);
 
 		glDrawElements(GL_TRIANGLES, m_VertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
@@ -232,18 +202,23 @@ void ExampleLayer::OnUpdate(Gecko::Timestep ts)
 void ExampleLayer::OnImGuiRender()
 {
 	ImGui::Begin("Settings");
+	ImGui::Text("Model settings");
 	ImGui::ColorEdit3("Rectangle color", glm::value_ptr(m_SquareColor));
 	ImGui::Checkbox("Display face", &m_DisplayFace);
-	ImGui::Text("Model settings");
+	ImGui::Checkbox("Wireframe mode", &m_WireframeMode);
 	ImGui::SliderFloat3("Rotate", m_Rotate, -360, 360);
 	ImGui::SliderFloat3("Translate", m_Translate, -10.0f, 10.0f, "%.4f");
-	ImGui::SliderFloat("FOV", &m_Fov, 0.0f, 200.0f);
-	ImGui::SliderFloat("Near Plane", &m_NearPlane, 0.01f, 1.0f, "%.4f");
-	ImGui::SliderFloat("Far Plane", &m_FarPlane, 100.0f, 10000.0f);
-	ImGui::Checkbox("Wireframe mode", &m_WireframeMode);
 	ImGui::SliderFloat("Transparency", &m_MixValue, 0.0f, 1.0f);
+	ImGui::Text("Camera settings");
+	ImGui::SliderFloat("FOV", &m_CameraData.VerticalFOV, 0.0f, 200.0f);
+	ImGui::SliderFloat("Near Plane", &m_CameraData.NearClip, 0.01f, 1.0f, "%.4f");
+	ImGui::SliderFloat("Far Plane", &m_CameraData.FarClip, 100.0f, 10000.0f);
+	ImGui::SliderFloat("Camera Speed", &m_CameraData.Speed, 1.0f, 100.0f);
+	ImGui::SliderFloat("Camera Rotation Speed", &m_CameraData.RotationSpeed, 0.1f, 15.0f);
 	//ImGui::SliderFloat3("Rotate", m_Rotate, -360, 360);
 	ImGui::End();
+
+	//m_Camera.UpdateProps(m_CameraData);
 }
 
 

@@ -2,27 +2,6 @@
 
 #include <Gecko.h>
 
-struct TransformData
-{
-	float Width, Height;
-	glm::mat4 Model;
-	glm::mat4 View;
-	glm::mat4 Projection;
-	
-	TransformData(glm::mat4 model, glm::mat4 view, glm::mat4 projection)
-	{
-		unsigned int width = Gecko::Application::Get().GetWindow().GetWidth();
-		unsigned int height = Gecko::Application::Get().GetWindow().GetHeight();
-
-		Width = (float)width;
-		Height = (float)height;
-
-		Model = model;
-		View = view;
-		Projection = projection;
-	}
-};
-
 class ExampleLayer : public Gecko::Layer
 {
 public:
@@ -42,17 +21,12 @@ private:
 	Gecko::Ref<Gecko::Texture2D> m_TextureFace;
 
 	Gecko::Camera m_Camera;
-	// Temp
-	glm::mat4 ViewProjectionMatrix;
+	Gecko::CameraProps m_CameraData = Gecko::CameraProps::CameraProps();
 
 	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
 	bool m_DisplayFace = false;
 	bool m_WireframeMode = false;
 	float m_Rotate[3] = { 0.0f };
 	float m_Translate[3] = { 0.0f, 0.0f, -3.0f };
-	float m_Fov = 45.0f;
-	float m_NearPlane = 0.1f;
-	float m_FarPlane = 100.0f;
 	float m_MixValue = 0.0f;
-	Gecko::Ref<TransformData> m_TransformData;
 };

@@ -82,7 +82,6 @@ namespace Gecko {
 		}
 
 		m_Minimized = false;
-		glViewport(0, 0, e.GetWidth(), e.GetHeight()); // Abstract this
 
 		return false;
 	}

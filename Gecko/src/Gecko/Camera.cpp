@@ -1,6 +1,7 @@
 #include "gkpch.h"
 #include "Camera.h"
 
+#include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
@@ -65,6 +66,8 @@ namespace Gecko {
 		m_ViewportHeight = height;
 
 		RecalculateProjection();
+
+		glViewport(0, 0, (int)width, (int)height);
 	}
 
 	void Camera::UpdateProps(CameraProps& props)
@@ -137,7 +140,7 @@ namespace Gecko {
 
 	void Camera::RecalculateProjection()
 	{
-		m_Projection = glm::perspectiveFov(glm::radians(m_VerticalFOV), m_ViewportWidth, m_ViewportHeight, m_NearClip, m_FarClip);
+		m_Projection = glm::perspective(glm::radians(m_VerticalFOV), m_ViewportWidth / m_ViewportHeight, m_NearClip, m_FarClip);
 		m_InverseProjection = glm::inverse(m_Projection);
 	}
 

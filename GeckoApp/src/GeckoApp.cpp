@@ -1,4 +1,5 @@
 #include "GeckoApp.h"
+#include "Gecko/Application.h"
 
 #include <imgui.h>
 #include <glm/glm.hpp>
@@ -9,9 +10,10 @@
 //#include <GLFW/glfw3.h>
 
 ExampleLayer::ExampleLayer()
-	: Layer("Example Layer"), m_Camera(1280.0f, 720.0f, Gecko::CameraProps::CameraProps())
+	: Layer("Example Layer"), m_Camera((float)Gecko::Application::Get().GetWindow().GetWidth(),
+									(float)Gecko::Application::Get().GetWindow().GetWidth(),
+									Gecko::CameraProps::CameraProps())
 {
-	//m_Camera.UpdateProps(m_CameraData);
 }
 
 ExampleLayer::~ExampleLayer()
@@ -137,6 +139,9 @@ void ExampleLayer::OnEvent(Gecko::Event& e)
 void ExampleLayer::OnUpdate(Gecko::Timestep ts)
 {
 	// Update camera
+	m_Camera.OnResize(
+		(float)Gecko::Application::Get().GetWindow().GetWidth(),
+		(float)Gecko::Application::Get().GetWindow().GetHeight());
 	m_Camera.UpdateProps(m_CameraData);
 	m_Camera.OnUpdate(ts);
 
@@ -217,8 +222,6 @@ void ExampleLayer::OnImGuiRender()
 	ImGui::SliderFloat("Camera Rotation Speed", &m_CameraData.RotationSpeed, 0.1f, 15.0f);
 	//ImGui::SliderFloat3("Rotate", m_Rotate, -360, 360);
 	ImGui::End();
-
-	//m_Camera.UpdateProps(m_CameraData);
 }
 
 
